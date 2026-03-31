@@ -1,70 +1,72 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct Tcarro {
+struct Carro {
     char modelo[30];
     char placa[30];
     char cor[30];
 };
 
-int fun_decre(int *fila);
-int fun_incre(int *fila);
-void flush_in();
-float calcValor(float preco, float qtd);
-int fun_invalidos(float prEta, float prGas, float prAdit, float tFila);
-int fun_escreva();
+int decrementarFila(int *tamanhoFila);
+int incrementarFila(int *tamanhoFila);
+void limparEntrada();
+float calcularValor(float preco, float quantidade);
+int validarEntradas(float precoEtanol, float precoGasolina, float precoAditivada, float capacidadeFila);
+int mostrarMenu();
 
 int main(void) {
 
-    float prEta = 1, prGas = 1, prAdit = 1;
-    float qtdEta = 0, qtdGas = 0, qtdAdit = 0;
-    float valRec, cAtendido = 0, tFila = 1;
+    float precoEtanol = 1, precoGasolina = 1, precoAditivada = 1;
+    float litrosEtanol = 0, litrosGasolina = 0, litrosAditivada = 0;
+    float valorArrecadado = 0;
+    float carrosAtendidos = 0;
+    float capacidadeFila = 1;
 
-    float etaRestante = 200, gasRestante = 200, aditRestante = 200;
+    float etanolRestante = 200, gasolinaRestante = 200, aditivadaRestante = 200;
 
-    int fila = 0, relatorio, menu;
-    int tam = 100;
-    int cont = 0;
+    int tamanhoFila = 0, opcaoMenu, opcaoRelatorio;
+    int capacidadeMaxima = 100;
+    int indiceCarro = 0;
 
-    struct Tcarro carros[tam];
+    struct Carro carros[100];
 
     do {
-        fun_invalidos(prEta, prGas, prAdit, tFila);
+        validarEntradas(precoEtanol, precoGasolina, precoAditivada, capacidadeFila);
 
         printf("\nDigite o preço do etanol: ");
-        scanf("%f", &prEta);
+        scanf("%f", &precoEtanol);
 
         printf("\nDigite o preço da gasolina: ");
-        scanf("%f", &prGas);
+        scanf("%f", &precoGasolina);
 
         printf("\nDigite o preço da gasolina aditivada: ");
-        scanf("%f", &prAdit);
+        scanf("%f", &precoAditivada);
 
         printf("\nInforme o tamanho da fila: ");
-        scanf("%f", &tFila);
+        scanf("%f", &capacidadeFila);
 
-    } while (prEta < 0 || prGas < 0 || prAdit < 0 || tFila <= 0);
+    } while (precoEtanol < 0 || precoGasolina < 0 || precoAditivada < 0 || capacidadeFila <= 0);
 
     do {
-        menu = fun_escreva();
+        opcaoMenu = mostrarMenu();
 
-        switch (menu) {
+        switch (opcaoMenu) {
 
             case 1:
-                if (fila < tFila) {
-                    fun_incre(&fila);
-                    flush_in();
+                if (tamanhoFila < capacidadeFila) {
+                    incrementarFila(&tamanhoFila);
+                    limparEntrada();
 
                     printf("\nModelo: ");
-                    fgets(carros[cont].modelo, 30, stdin);
+                    fgets(carros[indiceCarro].modelo, 30, stdin);
 
                     printf("\nCor: ");
-                    fgets(carros[cont].cor, 30, stdin);
+                    fgets(carros[indiceCarro].cor, 30, stdin);
 
                     printf("\nPlaca: ");
-                    fgets(carros[cont].placa, 30, stdin);
+                    fgets(carros[indiceCarro].placa, 30, stdin);
 
-                    cont++;
+                    indiceCarro++;
                     printf("\nCarro adicionado\n");
                 } else {
                     printf("\nFila cheia\n");
@@ -72,21 +74,22 @@ int main(void) {
                 break;
 
             case 2:
-                if (fila > 0) {
+                if (tamanhoFila > 0) {
+
                     printf("\nEtanol: ");
-                    scanf("%f", &qtdEta);
-                    etaRestante -= qtdEta;
+                    scanf("%f", &litrosEtanol);
+                    etanolRestante -= litrosEtanol;
 
                     printf("\nGasolina: ");
-                    scanf("%f", &qtdGas);
-                    gasRestante -= qtdGas;
+                    scanf("%f", &litrosGasolina);
+                    gasolinaRestante -= litrosGasolina;
 
                     printf("\nAditivada: ");
-                    scanf("%f", &qtdAdit);
-                    aditRestante -= qtdAdit;
+                    scanf("%f", &litrosAditivada);
+                    aditivadaRestante -= litrosAditivada;
 
-                    cAtendido++;
-                    fun_decre(&fila);
+                    carrosAtendidos++;
+                    decrementarFila(&tamanhoFila);
 
                 } else {
                     printf("Fila vazia\n");
@@ -94,46 +97,46 @@ int main(void) {
                 break;
 
             case 4:
-                printf("Carros atendidos: %.0f\n", cAtendido);
+                printf("\nCarros atendidos: %.0f\n", carrosAtendidos);
                 break;
 
         }
 
-    } while (menu != 5);
+    } while (opcaoMenu != 5);
 
     return 0;
 }
 
-float calcValor(float preco, float qtd) {
-    return preco * qtd;
+float calcularValor(float preco, float quantidade) {
+    return preco * quantidade;
 }
 
-int fun_invalidos(float prEta, float prGas, float prAdit, float tFila) {
-    if (prEta < 0) printf("Etanol inválido\n");
-    if (prGas < 0) printf("Gasolina inválida\n");
-    if (prAdit < 0) printf("Aditivada inválida\n");
-    if (tFila <= 0) printf("Fila inválida\n");
+int validarEntradas(float precoEtanol, float precoGasolina, float precoAditivada, float capacidadeFila) {
+    if (precoEtanol < 0) printf("Etanol inválido\n");
+    if (precoGasolina < 0) printf("Gasolina inválida\n");
+    if (precoAditivada < 0) printf("Aditivada inválida\n");
+    if (capacidadeFila <= 0) printf("Fila inválida\n");
     return 0;
 }
 
-int fun_escreva() {
+int mostrarMenu() {
     int opcao;
     printf("\n1-Adicionar\n2-Abastecer\n3-Próximo\n4-Relatório\n5-Sair\n");
     scanf("%d", &opcao);
     return opcao;
 }
 
-void flush_in() {
+void limparEntrada() {
     int ch;
     while ((ch = fgetc(stdin)) != EOF && ch != '\n') {}
 }
 
-int fun_incre(int *fila) {
-    (*fila)++;
-    return *fila;
+int incrementarFila(int *tamanhoFila) {
+    (*tamanhoFila)++;
+    return *tamanhoFila;
 }
 
-int fun_decre(int *fila) {
-    (*fila)--;
-    return *fila;
+int decrementarFila(int *tamanhoFila) {
+    (*tamanhoFila)--;
+    return *tamanhoFila;
 }
